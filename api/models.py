@@ -9,7 +9,7 @@ class Building(models.Model):
 class AccessPoint(models.Model):
     ap_id = models.AutoField(primary_key=True)
     building_id = models.ForeignKey(Building, on_delete=models.CASCADE)
-    bssid = models.CharField(max_length=500, null=True, blank=True)
+    ssid = models.CharField(max_length=500, null=True, blank=True)
     mac_address = models.CharField(max_length=500, null=True, blank=True)
 
 class Location(models.Model):

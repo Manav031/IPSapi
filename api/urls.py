@@ -8,5 +8,6 @@ urlpatterns = [
     path('accesspoints/<pk>/', views.AccessPointDetail.as_view(), name="accesspoint_detail"),
     path('locations/', views.LocationList.as_view(), name="location_list"),
     path('locations/<pk>/', views.LocationDetail.as_view(), name="location_detail"),
-    path('check_mac/', views.check_mac, name='check_mac')
+    path('check_mac/', views.check_mac, name='check_mac'),
+    path('callibrate_location/', views.callibrate_location, name="callibrate_location")
 ]

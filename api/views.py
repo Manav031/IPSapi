@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
+import json
 
 from .models import Building, AccessPoint, Location
 from .serializers import BuildingSerializer, AccessPointSerialzer, LocationSerializer
@@ -212,3 +213,25 @@ def check_mac(request):
                 location_data['far_from_ap'] = location.far_from_ap_m
         return Response({"detail": True, "location_data": location_data, 'building_name': building_data.building_name + "-" + str(building_data.floor)}, status=status.HTTP_200_OK)
     return Response({"detail": False}, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['POST'])
+def callibrate_location(request):
+    building_id = request.data.get('building_id')
+    ap_data = json.loads(request.data.get('ap_data'))
+    location_data = json.loads(request.data.get('location_data'))
+    building_obj = BuildingDetail().get_object(building_id)
+    if not AccessPoint.objects.filter(mac_address=ap_data.get('mac_address')).exists():
+        ap_data['building_id'] = building_obj.building_id
+        ap_serializer = AccessPointSerialzer(data=ap_data)
+        if ap_serializer.is_valid():
+            ap_id = ap_serializer.save()
+    else:
+        ap_id = AccessPoint.objects.filter(mac_address=ap_data.get('mac_address')).first()
+    
+    location_data['ap_id'] = ap_id.ap_id
+    location_serializer = LocationSerializer(data=location_data)
+    if location_serializer.is_valid():
+        location_serializer.save()
+        return Response({"detail": "success"}, status=status.HTTP_200_OK)
+
+    return Response({"detail": "something went wrong"}, status=status.HTTP_400_BAD_REQUEST)
